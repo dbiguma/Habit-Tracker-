@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Source art for the app icons. Full-bleed square: iPhone rounds the corners itself.
+       Everything important stays inside the center 80% so "maskable" cropping is safe. -->
+  <rect width="512" height="512" fill="#0a7c6e"/>
+  <circle cx="256" cy="256" r="150" fill="none" stroke="#ffffff" stroke-opacity="0.28" stroke-width="30"/>
+  <path d="M256 106 A150 150 0 1 1 113.3 209.6" fill="none" stroke="#ffffff" stroke-width="30" stroke-linecap="round"/>
+  <path d="M190 262 L236 308 L326 212" fill="none" stroke="#ffffff" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
