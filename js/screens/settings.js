@@ -135,6 +135,6 @@ export function render(root) {
   // ---- About ----
   root.append(el('section', { class: 'card' },
     el('h2', { class: 'section-title' }, 'About'),
-    el('p', { class: 'note' }, 'Habit Tracker v1.1. Works offline. No accounts, no tracking, nothing leaves this device.'),
+    el('p', { class: 'note' }, 'Habit Tracker v1.2. Works offline. No accounts, no tracking, nothing leaves this device.'),
     el('p', { class: 'note' }, 'Tip: use the app from its Home Screen icon. Safari and the Home Screen app keep separate data.')));
 }

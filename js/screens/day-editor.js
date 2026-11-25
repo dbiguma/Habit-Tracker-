@@ -3,22 +3,43 @@ import { el, toast } from '../ui.js';
 import { habits } from '../habits/index.js';
 import { getDay, getSettings, updateDay, setWaterUnit } from '../storage.js';
 import { dayStatus } from '../stats.js';
-import { todayKey, addDays, formatLong } from '../dates.js';
+import { todayKey, addDays, formatLong, formatMedium } from '../dates.js';
+
+/** Bar at the top of Today: one tap to log yesterday, with how much of it is filled in. */
+function yesterdayShortcut(yesterday) {
+  const goals = getSettings().goals;
+  const record = getDay(yesterday);
+  const met = habits.filter((h) => dayStatus(h, record, goals).met).length;
+  const status = record ? `${met} of ${habits.length} goals met` : 'Nothing logged yet';
+  return el('a', {
+    class: record ? 'yesterday' : 'yesterday empty',
+    href: `#/day/${yesterday}`,
+    'aria-label': `Log yesterday, ${formatLong(yesterday)}: ${status}`,
+  },
+  el('span', { class: 'y-icon', 'aria-hidden': 'true' }, '⏪'),
+  el('span', { class: 'y-text', 'aria-hidden': 'true' },
+    el('strong', {}, `Log yesterday · ${formatMedium(yesterday)}`),
+    el('span', { class: 'y-status' }, status)),
+  el('span', { class: 'chev', 'aria-hidden': 'true' }, '›'));
+}
 
 export function renderDayEditor(root, key) {
   const today = todayKey();
   const isToday = key === today;
+  const prev = addDays(key, -1);
+  const next = addDays(key, 1);
 
   if (isToday) {
     root.append(el('header', { class: 'screen-head' },
       el('h1', {}, 'Today'),
-      el('p', { class: 'sub' }, formatLong(key))));
+      el('p', { class: 'sub' }, formatLong(key))),
+    yesterdayShortcut(addDays(key, -1)));
   } else {
-    const prev = addDays(key, -1);
-    const next = addDays(key, 1);
     root.append(
       el('header', { class: 'screen-head' },
-        el('a', { class: 'back-link', href: '#/history' }, '‹ Back to History'),
+        next === today
+          ? el('a', { class: 'back-link', href: '#/today' }, '‹ Back to Today')
+          : el('a', { class: 'back-link', href: '#/history' }, '‹ Back to History'),
         el('h1', {}, formatLong(key)),
         el('p', { class: 'sub' }, 'Editing a past day')),
       el('nav', { class: 'day-nav', 'aria-label': 'Change day' },

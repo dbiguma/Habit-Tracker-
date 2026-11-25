@@ -15,6 +15,10 @@ A simple, private habit tracker for iPhone. Log water, sleep, exercise and steps
 | 🏃 Exercise | 30 minutes | Add one or more sessions (minutes + type). Total minutes count toward the goal. A 0-minute session records a day with no exercise. |
 | 👟 Steps | 10,000 | Type the number in, or use ±1,000. |
 
+## Forgot to log?
+
+The **Log yesterday** bar at the top of Today opens yesterday in one tap and shows whether anything is logged. Older days are under **History**.
+
 ## How the math works
 
 - **✅ Goal met** when the amount logged is **at or above** the goal. "Not logged" counts as ❌.
