@@ -139,6 +139,8 @@ main {
 .stepper-input::placeholder { color: var(--muted); opacity: 0.6; }
 .stepper-unit { margin-top: 3px; font-size: 14px; color: var(--muted); }
 
+.hm > .stepper + .stepper { margin-top: 10px; }
+
 /* ---------- Segmented toggle ---------- */
 .seg {
   display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px;

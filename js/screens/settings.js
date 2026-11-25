@@ -78,7 +78,19 @@ export function render(root) {
         onChange: (u) => { setWaterUnit(u); refresh(); },
       })));
 
+  const saveGoal = (h, value) => {
+    if (setGoal(h.id, value, today)) toast('Goal saved ✓');
+    else toast("Couldn't save.", 'error');
+    refresh();
+  };
+
   for (const h of habits) {
+    if (h.renderGoalInput) {
+      goals.append(el('div', { class: 'field' },
+        el('span', { class: 'field-label' }, `${h.emoji} ${h.label} goal`),
+        h.renderGoalInput(settings.goals[h.id], (v) => saveGoal(h, v))));
+      continue;
+    }
     const f = h.goalField(settings.goals[h.id], settings);
     const id = `goal-${h.id}`;
     goals.append(el('div', { class: 'field' },
@@ -86,11 +98,7 @@ export function render(root) {
       stepper({
         id, label: `${h.label} goal`, value: f.value, step: f.step, stepText: f.stepText, unit: f.unit,
         min: f.min, max: f.max, decimals: f.decimals, integer: f.integer, allowEmpty: false,
-        onChange: (v) => {
-          if (setGoal(h.id, f.toStored(v), today)) toast('Goal saved ✓');
-          else toast("Couldn't save.", 'error');
-          refresh();
-        },
+        onChange: (v) => saveGoal(h, f.toStored(v)),
       }),
       f.hint && el('p', { class: 'hint center' }, f.hint)));
   }
@@ -127,6 +135,6 @@ export function render(root) {
   // ---- About ----
   root.append(el('section', { class: 'card' },
     el('h2', { class: 'section-title' }, 'About'),
-    el('p', { class: 'note' }, 'Habit Tracker v1.0. Works offline. No accounts, no tracking, nothing leaves this device.'),
+    el('p', { class: 'note' }, 'Habit Tracker v1.1. Works offline. No accounts, no tracking, nothing leaves this device.'),
     el('p', { class: 'note' }, 'Tip: use the app from its Home Screen icon. Safari and the Home Screen app keep separate data.')));
 }

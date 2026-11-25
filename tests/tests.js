@@ -16,7 +16,7 @@ function eq(actual, expected, label = '') {
 }
 
 const { water, sleep, exercise, steps } = habitById;
-const GOALS = { water: 64, sleep: 7, exercise: 30, steps: 10000 };
+const GOALS = { water: 64, sleep: 420, exercise: 30, steps: 10000 }; // sleep in minutes
 const TODAY = '2026-11-22'; // a Sunday
 
 // ---------- Dates (local time zone) ----------
@@ -48,8 +48,17 @@ test('Water below goal = not met', () => eq(dayStatus(water, { water: 63.99 }, G
 test('Not logged = not met, not logged', () => eq(dayStatus(water, null, GOALS), { amount: null, goal: 64, logged: false, met: false }));
 test('Logged 0 = logged, not met', () => eq(dayStatus(water, { water: 0 }, GOALS).logged, true));
 test('Liters: 2 L logged vs 2 L goal = met', () => eq(dayStatus(water, { water: litersToFlOz(2) }, { ...GOALS, water: litersToFlOz(2) }).met, true));
-test('Sleep 6.75 h vs 7 h = not met', () => eq(dayStatus(sleep, { sleep: 6.75 }, GOALS).met, false));
-test('Sleep 7.25 h vs 7 h = met', () => eq(dayStatus(sleep, { sleep: 7.25 }, GOALS).met, true));
+test('Sleep 6 h 59 min vs 7 h = not met', () => eq(dayStatus(sleep, { sleep: 419 }, GOALS).met, false));
+test('Sleep exactly 7 h 0 min = met', () => eq(dayStatus(sleep, { sleep: 420 }, GOALS).met, true));
+test('Sleep 7 h 23 min = met', () => eq(dayStatus(sleep, { sleep: 443 }, GOALS).met, true));
+test('Sleep shows as hours + minutes', () => eq([sleep.formatAmount(443), sleep.formatAmount(420), sleep.formatAmount(45)], ['7 h 23 min', '7 h', '45 min']));
+test('Sleep rejects fractional minutes', () => eq(sleep.validateValue(442.5), undefined));
+test('Exercise: one 0-minute session = logged, not met', () => {
+  const s = dayStatus(exercise, { exercise: [{ minutes: 0, type: 'Walk' }] }, GOALS);
+  eq([s.logged, s.amount, s.met], [true, 0, false]);
+});
+test('Exercise: 0-minute session passes the import check', () => eq(exercise.validateValue([{ minutes: 0, type: 'Walk' }]), [{ minutes: 0, type: 'Walk' }]));
+test('Exercise: negative minutes rejected', () => eq(exercise.validateValue([{ minutes: -5, type: 'Walk' }]), undefined));
 test('Exercise sums sessions: 20 + 15 = 35 ≥ 30', () => {
   const s = dayStatus(exercise, { exercise: [{ minutes: 20, type: 'Walk' }, { minutes: 15, type: 'Yoga' }] }, GOALS);
   eq([s.amount, s.met], [35, true]);
@@ -83,12 +92,12 @@ test('Streak longer than a week, across a month boundary', () => {
   eq(currentStreak(steps, days, GOALS, TODAY), 40);
 });
 test('Yesterday missed, today met: streak = 1', () => {
-  eq(currentStreak(sleep, { [TODAY]: { sleep: 8 }, '2026-11-21': { sleep: 5 } }, GOALS, TODAY), 1);
+  eq(currentStreak(sleep, { [TODAY]: { sleep: 480 }, '2026-11-21': { sleep: 300 } }, GOALS, TODAY), 1);
 });
 
 // ---------- Import checks ----------
 const sample = () => ({
-  schemaVersion: 1,
+  schemaVersion: 2,
   settings: { goals: { ...GOALS }, waterUnit: 'metric', lastExportAt: null },
   days: { '2026-11-22': { water: 64, exercise: [{ minutes: 30, type: 'Walk' }], goals: { ...GOALS } } },
 });
@@ -102,6 +111,16 @@ test('Rejects a bad date key', () => { const s = sample(); s.days['2026-13-01'] 
 test('Rejects negative water', () => { const s = sample(); s.days['2026-11-22'].water = -5; eq(validateData(s).ok, false); });
 test('Rejects fractional steps', () => { const s = sample(); s.days['2026-11-22'].steps = 10.5; eq(validateData(s).ok, false); });
 test('Rejects a backup from a newer app version', () => { const s = sample(); s.schemaVersion = 99; eq(validateData(s).ok, false); });
+test('Old v1 backup: sleep hours are converted to minutes', () => {
+  const v1 = {
+    schemaVersion: 1,
+    settings: { goals: { water: 64, sleep: 7.5, exercise: 30, steps: 10000 }, waterUnit: 'us', lastExportAt: null },
+    days: { '2026-11-22': { sleep: 6.75, water: 64, goals: { water: 64, sleep: 7, exercise: 30, steps: 10000 } } },
+  };
+  const r = validateData(v1);
+  eq([r.ok, r.data.schemaVersion, r.data.settings.goals.sleep, r.data.days['2026-11-22'].sleep, r.data.days['2026-11-22'].goals.sleep, r.data.days['2026-11-22'].water],
+    [true, 2, 450, 405, 420, 64]);
+});
 test('Day without saved goals gets the file goals', () => {
   const s = sample(); delete s.days['2026-11-22'].goals;
   eq(validateData(s).data.days['2026-11-22'].goals.water, 64);

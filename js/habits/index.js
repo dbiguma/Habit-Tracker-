@@ -9,7 +9,8 @@
 //   formatAmount(n, settings)-> "64 fl oz"
 //   formatValue(n, settings) -> "64" (number only, in the chosen unit)
 //   describe(n, settings)    -> optional extra line, e.g. a unit conversion
-//   goalField(goal, settings)-> how Settings edits the goal
+//   goalField(goal, settings)-> how Settings edits the goal (standard stepper)
+//   renderGoalInput(goal, onChange) -> optional custom goal control (sleep uses hours + minutes)
 //   renderInput(ctx)         -> the controls on the Today / Edit Day card
 import water from './water.js';
 import sleep from './sleep.js';

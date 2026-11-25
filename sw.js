@@ -4,7 +4,7 @@
 // That is how phones find out there's a new version to download.
 // When you ADD a file, also add it to FILES.
 
-const VERSION = 'v1.0.0';
+const VERSION = 'v1.1.0';
 const CACHE_PREFIX = 'habit-tracker-';
 const CACHE = `${CACHE_PREFIX}${VERSION}`;
 

@@ -11,8 +11,8 @@ A simple, private habit tracker for iPhone. Log water, sleep, exercise and steps
 | Habit | Default goal | Notes |
 |---|---|---|
 | 💧 Water | 64 fl oz (0.5 gal / 1.89 L) | Switch between fl oz and liters. The other units are shown as a conversion. Stored in fl oz. |
-| 😴 Sleep | 7 hours | 15-minute steps. Log it the morning you wake up. |
-| 🏃 Exercise | 30 minutes | Add one or more sessions (minutes + type). Total minutes count toward the goal. |
+| 😴 Sleep | 7 hours | Hours + minutes, to the minute. Log it the morning you wake up. Stored in minutes. |
+| 🏃 Exercise | 30 minutes | Add one or more sessions (minutes + type). Total minutes count toward the goal. A 0-minute session records a day with no exercise. |
 | 👟 Steps | 10,000 | Type the number in, or use ±1,000. |
 
 ## How the math works

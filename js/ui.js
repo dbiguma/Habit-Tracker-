@@ -56,10 +56,11 @@ export function parseNumber(text, { integer = false } = {}) {
  * value: number or null (null = empty / not logged), in display units.
  * onChange(newValue) is called after each change.
  * onStep(direction) can replace the built-in +/- math (used by water to avoid rounding drift).
+ * canStep(direction) can decide when +/- are enabled (used by sleep so minutes carry into hours).
  */
 export function stepper({
   id, label, value, step, stepText, unit = '', min = 0, max = Infinity,
-  decimals = 2, integer = false, allowEmpty = true, onChange, onStep, focusKey = id,
+  decimals = 2, integer = false, allowEmpty = true, onChange, onStep, canStep, focusKey = id,
 }) {
   let current = value;
 
@@ -83,6 +84,7 @@ export function stepper({
   const minus = button(-1);
   const plus = button(1);
   const updateButtons = () => {
+    if (canStep) { minus.disabled = !canStep(-1); plus.disabled = !canStep(1); return; }
     minus.disabled = current === null || current <= min;
     plus.disabled = current !== null && current >= max;
   };

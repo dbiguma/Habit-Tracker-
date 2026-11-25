@@ -1,11 +1,12 @@
 // Everything about saving data on this device (localStorage), plus export/import checks.
 // All data lives under ONE key. The key is unique on purpose: every project site under
 // <username>.github.io shares the same localStorage, so a generic name could clash.
+// (The key keeps "v1" forever; the data's format version is `schemaVersion` inside it.)
 import { isValidKey } from './dates.js';
 import { habits, defaultGoals } from './habits/index.js';
 
 export const STORAGE_KEY = 'habitTracker.v1.data';
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 const WATER_UNITS = ['us', 'metric'];
 
 let data = null;          // in-memory copy, loaded once
@@ -20,8 +21,23 @@ export function freshData() {
 }
 
 // Future versions: add upgrade steps here, e.g. 1 -> 2 when adding meditation.
+// Each step upgrades data from version N to N + 1. Old backups are upgraded the same way.
 const migrations = {
-  // 1: (old) => ({ ...old, schemaVersion: 2, ... }),
+  // v1 -> v2: sleep changed from decimal hours (7.5) to whole minutes (450).
+  1: (old) => {
+    const next = JSON.parse(JSON.stringify(old));
+    const toMinutes = (h) => (typeof h === 'number' ? Math.round(h * 60) : h);
+    next.schemaVersion = 2;
+    if (next.settings?.goals) next.settings.goals.sleep = toMinutes(next.settings.goals.sleep);
+    if (next.days && typeof next.days === 'object') {
+      for (const rec of Object.values(next.days)) {
+        if (!rec || typeof rec !== 'object') continue;
+        rec.sleep = toMinutes(rec.sleep);
+        if (rec.goals) rec.goals.sleep = toMinutes(rec.goals.sleep);
+      }
+    }
+    return next;
+  },
 };
 
 export function load() {

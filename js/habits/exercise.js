@@ -1,5 +1,6 @@
 // 🏃 Exercise — one or more sessions per day, each with minutes + type.
 // The goal is checked against the TOTAL minutes; the type doesn't affect it.
+// A 0-minute session is allowed: it records "I didn't exercise" (logged, goal not met).
 import { formatNumber as fmt } from '../units.js';
 import { el, stepper } from '../ui.js';
 
@@ -22,7 +23,7 @@ export default {
     const out = [];
     for (const s of v) {
       if (!s || typeof s !== 'object') return undefined;
-      if (!Number.isInteger(s.minutes) || s.minutes < 1 || s.minutes > MAX_MINUTES) return undefined;
+      if (!Number.isInteger(s.minutes) || s.minutes < 0 || s.minutes > MAX_MINUTES) return undefined;
       const type = typeof s.type === 'string' ? s.type.trim().slice(0, 30) : '';
       if (!type) return undefined;
       out.push({ minutes: s.minutes, type });
@@ -76,7 +77,7 @@ export default {
       el('p', { class: 'form-label' }, 'How long?'),
       stepper({
         id: 'exercise-minutes', label: 'Exercise minutes', value: minutes, step: 5, stepText: '5 min',
-        unit: 'minutes', min: 1, max: MAX_MINUTES, decimals: 0, integer: true, allowEmpty: false,
+        unit: 'minutes', min: 0, max: MAX_MINUTES, decimals: 0, integer: true, allowEmpty: false,
         onChange: (v) => { minutes = v; },
       }),
       el('p', { class: 'form-label' }, 'What kind?'),
